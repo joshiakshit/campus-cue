@@ -1,0 +1,12 @@
+name = "campuscue-updates"
+main = "src/index.ts"
+compatibility_date = "2026-05-23"
+workers_dev = true
+
+[[r2_buckets]]
+binding = "APK_BUCKET"
+bucket_name = "campuscue-apks"
+
+[vars]
+DEFAULT_CHANNEL = "release"
+PUBLIC_BASE_URL = ""

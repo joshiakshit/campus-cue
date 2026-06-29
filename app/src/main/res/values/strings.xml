@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CampusCue</string>
+    <string name="widget_qr_label">Scan QR</string>
+    <string name="widget_qr_description">Mark attendance by scanning the classroom QR.</string>
+    <string name="shortcut_qr_short">Scan QR</string>
+    <string name="shortcut_qr_long">Scan attendance QR</string>
+</resources>
