@@ -10,15 +10,20 @@ signal in the lecture hall.
 > A personal project I built for myself as a Galgotias University student. GU-only by
 > design — the tenant naming in the code is just configuration hygiene, not a roadmap.
 
-<!--
-  Add screenshots to docs/screenshots/ then uncomment:
-  <p align="center">
-    <img src="docs/screenshots/dashboard.png" width="22%" alt="Dashboard" />
-    <img src="docs/screenshots/attendance.png" width="22%" alt="Attendance" />
-    <img src="docs/screenshots/timetable.png" width="22%" alt="Timetable" />
-    <img src="docs/screenshots/grades.png" width="22%" alt="Grades" />
-  </p>
--->
+<p align="center">
+  <img src="docs/screenshots/dashboard.jpeg" width="19%" alt="Dashboard" />
+  <img src="docs/screenshots/attendance.jpeg" width="19%" alt="Attendance" />
+  <img src="docs/screenshots/timetable.jpeg" width="19%" alt="Timetable" />
+  <img src="docs/screenshots/day-wise.jpeg" width="19%" alt="Day-wise calendar" />
+  <img src="docs/screenshots/planner.jpeg" width="19%" alt="Leave planner" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/performance.jpeg" width="19%" alt="Marks performance" />
+  <img src="docs/screenshots/result.jpeg" width="19%" alt="Result card" />
+  <img src="docs/screenshots/qr.jpeg" width="19%" alt="QR attendance" />
+  <img src="docs/screenshots/settings.jpeg" width="19%" alt="Settings" />
+  <img src="docs/screenshots/biometric.jpeg" width="19%" alt="Biometric lock" />
+</p>
 
 ## Why I built it
 
