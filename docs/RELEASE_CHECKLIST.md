@@ -18,10 +18,15 @@ After bumping `versionCode`/`versionName` in `app/build.gradle.kts`, run:
 
 `scripts/release.ps1` reads the version from `build.gradle.kts` (so it can't drift),
 then runs ktlintCheck → detekt → test → assembleRelease, asserts the APK is signed
-with the long-term CampusCue cert, publishes to the Worker, and verifies the live
-`/update/check` returns the new version with a byte-matching SHA-256. It fails fast
-on any mismatch. Pass `-MinSupported <code>` only when you intend a forced update
-(default keeps the current floor).
+with the long-term CampusCue cert, publishes to the Worker, verifies the live
+`/update/check` returns the new version with a byte-matching SHA-256, and finally cuts
+a matching **GitHub release** (`vX.Y.Z`, notes-only, with the install link) using the
+cached git credential token — no `gh` CLI needed. It fails fast on any build/publish
+mismatch; the GitHub-release step is non-fatal (warns if the tag already exists or the
+commit isn't pushed yet, since the real distribution has already succeeded by then).
+Pass `-MinSupported <code>` only when you intend a forced update (default keeps the
+current floor). **Push your release commit to `origin/main` before running** so the
+GitHub release tags the right commit.
 
 Prerequisite (once): `cd worker && npm install`, and `npm run deploy` whenever the
 Worker code itself changes.

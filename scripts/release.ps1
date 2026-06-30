@@ -1,7 +1,8 @@
 <#
 .SYNOPSIS
   One-command CampusCue release: verify -> build signed APK -> check signature
-  -> publish to the Cloudflare Worker -> verify the live update endpoint.
+  -> publish to the Cloudflare Worker -> verify the live update endpoint
+  -> cut a matching GitHub release (notes-only, via the cached git token; no gh CLI).
 
 .DESCRIPTION
   Reads versionCode / versionName straight from app/build.gradle.kts so the
@@ -96,8 +97,36 @@ Remove-Item $tmp -Force -ErrorAction SilentlyContinue
 if ($localHash -ne $remoteHash) { Fail "Published APK hash ($remoteHash) != local build ($localHash)" }
 if ($resp.sha256.ToLower() -ne $localHash) { Fail "Manifest sha256 ($($resp.sha256)) != local build ($localHash)" }
 
+# --- 7. Cut a matching GitHub release (notes-only) ---
+# Non-fatal: the real distribution (Worker/R2) already succeeded above, so a GitHub
+# hiccup here shouldn't fail the run. Uses the git-credential-cached GitHub token, so
+# it needs no `gh` CLI. The release commit must already be pushed to origin/main.
+$releaseUrl = $null
+$originUrl = (git remote get-url origin 2>$null)
+if ($originUrl -match 'github\.com[:/]([^/]+)/([^/.]+)') {
+    $repoSlug = "$($matches[1])/$($matches[2])"
+    $cred = "protocol=https`nhost=github.com`n`n" | git credential fill 2>$null
+    $token = (($cred | Select-String '^password=') -replace 'password=','').Trim()
+    if ($token) {
+        $relNotes = "$ReleaseNotes`n`n### Install`nInstall or update CampusCue (Galgotias University students, access-gated):`n**$workerUrl/install**`n`nExisting users update automatically inside the app."
+        $payload = @{ tag_name = "v$versionName"; target_commitish = "main"; name = "CampusCue $versionName"; body = $relNotes; draft = $false; prerelease = $false } | ConvertTo-Json
+        try {
+            $rel = Invoke-RestMethod -Uri "https://api.github.com/repos/$repoSlug/releases" -Method Post -Headers @{ Authorization = "token $token"; "User-Agent" = "campuscue"; Accept = "application/vnd.github+json" } -Body $payload
+            $releaseUrl = $rel.html_url
+            Write-Host "==> GitHub release created: $releaseUrl" -ForegroundColor Green
+        } catch {
+            Write-Host "WARN: GitHub release not created (v$versionName may already exist, or commit not pushed). $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "WARN: no cached GitHub token found; skipped GitHub release." -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "WARN: origin is not a github.com remote; skipped GitHub release." -ForegroundColor Yellow
+}
+
 Write-Host ""
 Write-Host "RELEASE COMPLETE: CampusCue $versionName ($versionCode)" -ForegroundColor Green
 Write-Host "  SHA-256:  $localHash"
 Write-Host "  Endpoint: $workerUrl/update/check -> $($resp.latestVersionName) ($($resp.latestVersionCode))"
 Write-Host "  Install:  $workerUrl/install"
+if ($releaseUrl) { Write-Host "  Release:  $releaseUrl" }
